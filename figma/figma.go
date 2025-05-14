@@ -43,53 +43,54 @@ type Node struct {
 	BackgroundColor Color           `json:"backgroundColor"`
 	ExportSettings  []ExportSetting `json:"exportSettings,omitempty"`
 	// FRAME
-	Fills                   []Paint              `json:"fills,omitempty"`
-	Strokes                 []Paint              `json:"strokes,omitempty"`
-	StrokeWeight            float64              `json:"strokeWeight,omitempty"`
-	StrokeAlign             StrokeAlign          `json:"strokeAlign,omitempty"`
-	StrokeDashes            []float64            `json:"strokeDashes,omitempty"`
-	CornerRadius            float64              `json:"cornerRadius,omitempty"`
-	RectangleCornerRadii    []float64            `json:"rectangleCornerRadii,omitempty"`
-	CornerSmoothing         float64              `json:"cornerSmoothing,omitempty"`
-	BlendMode               BlendMode            `json:"blendMode,omitempty"`
-	PreserveRatio           bool                 `json:"preserveRatio,omitempty"`
-	TargetAspectRatio       Vector               `json:"targetAspectRatio"`
-	Constraints             LayoutConstraint     `json:"constraints"`
-	LayoutAlign             LayoutAlign          `json:"layoutAlign,omitempty"`
-	Opacity                 float64              `json:"opacity,omitempty"`
-	AbsoluteBoundingBox     Rectangle            `json:"absoluteBoundingBox"`
-	AbsoluteRenderBounds    Rectangle            `json:"absoluteRenderBounds"`
-	Size                    Vector               `json:"size"`
-	MinWidth                float64              `json:"minWidth,omitempty"`
-	MaxWidth                float64              `json:"maxWidth,omitempty"`
-	MinHeight               float64              `json:"minHeight,omitempty"`
-	MaxHeight               float64              `json:"maxHeight,omitempty"`
-	RelativeTransform       Transform            `json:"relativeTransform,omitempty"`
-	ClipsContent            bool                 `json:"clipsContent,omitempty"`
-	LayoutMode              LayoutMode           `json:"layoutMode,omitempty"`
-	LayoutSizingHorizontal  LayoutSizing         `json:"layoutSizingHorizontal,omitempty"`
-	LayoutSizingVertical    LayoutSizing         `json:"layoutSizingVertical,omitempty"`
-	LayoutWrap              LayoutWrap           `json:"layoutWrap,omitempty"`
-	PrimaryAxisSizingMode   SizingMode           `json:"primaryAxisSizingMode,omitempty"`
-	CounterAxisSizingMode   SizingMode           `json:"counterAxisSizingMode,omitempty"`
-	PrimaryAxisAlignItems   AlignItems           `json:"primaryAxisAlignItems,omitempty"`
-	CounterAxisAlignItems   AlignItems           `json:"counterAxisAlignItems,omitempty"`
-	CounterAxisAlignContent AlignContent         `json:"counterAxisAlignContent,omitempty"`
-	PaddingLeft             float64              `json:"paddingLeft,omitempty"`
-	PaddingRight            float64              `json:"paddingRight,omitempty"`
-	PaddingTop              float64              `json:"paddingTop,omitempty"`
-	PaddingBottom           float64              `json:"paddingBottom,omitempty"`
-	ItemSpacing             float64              `json:"itemSpacing,omitempty"`
-	CounterAxisSpacing      float64              `json:"counterAxisSpacing,omitempty"`
-	LayoutPositioning       LayoutPositioning    `json:"layoutPositioning,omitempty"`
-	ItemReverseZIndex       bool                 `json:"itemReverseZIndex,omitempty"`
-	StrokesIncludedInLayout bool                 `json:"strokesIncludedInLayout,omitempty"`
-	LayoutGrids             []LayoutGrid         `json:"layoutGrids,omitempty"`
-	OverflowDirection       OverflowDirection    `json:"overflowDirection,omitempty"`
-	Effects                 []Effect             `json:"effects,omitempty"`
-	IsMask                  bool                 `json:"isMask,omitempty"`
-	MaskType                MaskType             `json:"maskType,omitempty"`
-	Styles                  map[StyleType]string `json:"styles,omitempty"`
+	Fills                   []Paint           `json:"fills,omitempty"`
+	Strokes                 []Paint           `json:"strokes,omitempty"`
+	StrokeWeight            float64           `json:"strokeWeight,omitempty"`
+	StrokeAlign             StrokeAlign       `json:"strokeAlign,omitempty"`
+	StrokeDashes            []float64         `json:"strokeDashes,omitempty"`
+	CornerRadius            float64           `json:"cornerRadius,omitempty"`
+	RectangleCornerRadii    []float64         `json:"rectangleCornerRadii,omitempty"`
+	CornerSmoothing         float64           `json:"cornerSmoothing,omitempty"`
+	BlendMode               BlendMode         `json:"blendMode,omitempty"`
+	PreserveRatio           bool              `json:"preserveRatio,omitempty"`
+	TargetAspectRatio       Vector            `json:"targetAspectRatio"`
+	Constraints             LayoutConstraint  `json:"constraints"`
+	LayoutAlign             LayoutAlign       `json:"layoutAlign,omitempty"`
+	Opacity                 float64           `json:"opacity,omitempty"`
+	AbsoluteBoundingBox     Rectangle         `json:"absoluteBoundingBox"`
+	AbsoluteRenderBounds    Rectangle         `json:"absoluteRenderBounds"`
+	Size                    Vector            `json:"size"`
+	MinWidth                float64           `json:"minWidth,omitempty"`
+	MaxWidth                float64           `json:"maxWidth,omitempty"`
+	MinHeight               float64           `json:"minHeight,omitempty"`
+	MaxHeight               float64           `json:"maxHeight,omitempty"`
+	RelativeTransform       Transform         `json:"relativeTransform,omitempty"`
+	ClipsContent            bool              `json:"clipsContent,omitempty"`
+	LayoutMode              LayoutMode        `json:"layoutMode,omitempty"`
+	LayoutSizingHorizontal  LayoutSizing      `json:"layoutSizingHorizontal,omitempty"`
+	LayoutSizingVertical    LayoutSizing      `json:"layoutSizingVertical,omitempty"`
+	LayoutWrap              LayoutWrap        `json:"layoutWrap,omitempty"`
+	PrimaryAxisSizingMode   SizingMode        `json:"primaryAxisSizingMode,omitempty"`
+	CounterAxisSizingMode   SizingMode        `json:"counterAxisSizingMode,omitempty"`
+	PrimaryAxisAlignItems   AlignItems        `json:"primaryAxisAlignItems,omitempty"`
+	CounterAxisAlignItems   AlignItems        `json:"counterAxisAlignItems,omitempty"`
+	CounterAxisAlignContent AlignContent      `json:"counterAxisAlignContent,omitempty"`
+	PaddingLeft             float64           `json:"paddingLeft,omitempty"`
+	PaddingRight            float64           `json:"paddingRight,omitempty"`
+	PaddingTop              float64           `json:"paddingTop,omitempty"`
+	PaddingBottom           float64           `json:"paddingBottom,omitempty"`
+	ItemSpacing             float64           `json:"itemSpacing,omitempty"`
+	CounterAxisSpacing      float64           `json:"counterAxisSpacing,omitempty"`
+	LayoutPositioning       LayoutPositioning `json:"layoutPositioning,omitempty"`
+	ItemReverseZIndex       bool              `json:"itemReverseZIndex,omitempty"`
+	StrokesIncludedInLayout bool              `json:"strokesIncludedInLayout,omitempty"`
+	LayoutGrids             []LayoutGrid      `json:"layoutGrids,omitempty"`
+	OverflowDirection       OverflowDirection `json:"overflowDirection,omitempty"`
+	Effects                 []Effect          `json:"effects,omitempty"`
+	IsMask                  bool              `json:"isMask,omitempty"`
+	MaskType                MaskType          `json:"maskType,omitempty"`
+	// TODO: this (StyleType) does not seem to match the values returned
+	Styles map[StyleType]string `json:"styles,omitempty"`
 	// SECTION
 	SectionContentsHidden bool `json:"sectionContentsHidden,omitempty"`
 	// VECTOR
@@ -443,12 +444,14 @@ const (
 )
 
 type Effect struct {
+	Type                 EffectType               `json:"type"`
 	Pattern              Pattern                  `json:"pattern"`
 	Visible              bool                     `json:"visible"`
 	Radius               float64                  `json:"radius"`
 	Color                Color                    `json:"color"`
 	BlendMode            BlendMode                `json:"blendMode"`
 	Offset               Vector                   `json:"offset"`
+	Spread               float64                  `json:"spread"`
 	ShowShadowBehindNode bool                     `json:"showShadowBehindNode"`
 	BoundVariables       map[string]VariableAlias `json:"boundVariables"`
 }
@@ -664,4 +667,12 @@ type ComponentProperty struct {
 type Overrides struct {
 	ID               string   `json:"id"`
 	OverriddenFields []string `json:"overriddenFields"`
+}
+
+type Token struct {
+	Name      string
+	Variable  string
+	Value     string
+	Theme     string
+	ClassName string
 }

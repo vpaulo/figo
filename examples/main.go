@@ -1,37 +1,40 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
 
 	"github.com/vpaulo/figo"
-	fg "github.com/vpaulo/figo/figma"
 )
 
 func main() {
 	figma := figo.Figma{
-		FILE_KEY: "",
-		API_KEY:  "",
+		FILE_KEY: "FIGMA_FILE",
+		API_KEY:  "YOUR_API_KEY",
 	}
 
+	// Get Figma data from API
 	// file, err := figma.GetData()
 	// if err != nil {
 	// 	fmt.Println("Error fetching Figma file:", err)
 	// 	return
 	// }
 
-	var file fg.File
-	dat, err := os.ReadFile("./tmp/original_output.json")
+	// Get Figma data from JSON file(API response saved in a JSON file)
+	file, err := figma.GetDataFromFile("./tmp/original_output.json")
 	if err != nil {
-		fmt.Println("Error Reading Figma file:", err)
+		fmt.Println("Error fetching Figma file:", err)
 		return
 	}
 
-	if unmarshallingError := json.Unmarshal(dat, &file); unmarshallingError != nil {
-		fmt.Println("Error Unmarshal Figma file:", unmarshallingError)
-		return
-	}
+	// TODO: GetVariables
 
-	figma.Normalise(file)
+	tokens := figma.ParseTokens(file)
+
+	// TODO: ParseVariablesTokens
+
+	tokensCSS, err := figma.GenerateTokensCSS(tokens)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("[tokensCSS] : %+v \n\n", tokensCSS)
 }
