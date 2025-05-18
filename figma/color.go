@@ -13,7 +13,7 @@ func (c *Color) Rgba() string {
 	red := c.Red * 255.0
 	green := c.Green * 255.0
 	blue := c.Blue * 255.0
-	alpha := c.Alpha
+	alpha := RoundToDecimals(c.Alpha, 2)
 
 	return fmt.Sprintf("rgba(%v,%v,%v,%v)", int(red), int(green), int(blue), alpha)
 }
