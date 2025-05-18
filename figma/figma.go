@@ -1,5 +1,6 @@
 package figma
 
+// Figma files types
 type File struct {
 	Name          string                  `json:"name"`
 	LastModified  string                  `json:"lastModified"`
@@ -675,4 +676,95 @@ type Token struct {
 	Value     string
 	Theme     string
 	ClassName string
+}
+
+// Figma Variables types
+type Variables struct {
+	Status float64 `json:"status"`
+	Error  bool    `json:"error"`
+	Meta   Meta    `json:"meta"`
+}
+
+type Meta struct {
+	Variables           map[string]Variable           `json:"variables"`
+	VariableCollections map[string]VariableCollection `json:"variableCollections"`
+}
+
+type Variable struct {
+	ID                   string                 `json:"id"`
+	Name                 string                 `json:"name"`
+	VariableCollectionId string                 `json:"variableCollectionId"`
+	ResolvedType         ResolvedType           `json:"resolvedType"`
+	ValuesByMode         map[string]interface{} `json:"valuesByMode"`
+	Remote               bool                   `json:"remote"`
+	Description          string                 `json:"description"`
+	HiddenFromPublishing bool                   `json:"hiddenFromPublishing"`
+	Scopes               []VariableScope        `json:"scopes"`
+	CodeSyntax           VariableCodeSyntax     `json:"codeSyntax"`
+	DeletedButReferenced bool                   `json:"deletedButReferenced"`
+}
+
+type VariableCollection struct {
+	ID                   string   `json:"id"`
+	Name                 string   `json:"name"`
+	Key                  string   `json:"key"`
+	Modes                []Modes  `json:"modes"`
+	DefaultModeId        string   `json:"defaultModeId"`
+	Remote               bool     `json:"remote"`
+	HiddenFromPublishing bool     `json:"hiddenFromPublishing"`
+	VariableIds          []string `json:"variableIds"`
+}
+
+type Modes struct {
+	ModeId string `json:"modeId"`
+	Name   string `json:"name"`
+}
+
+type ResolvedType string
+
+const (
+	ResolvedTypeBoolean ResolvedType = "BOOLEAN"
+	ResolvedTypeFloat                = "FLOAT"
+	ResolvedTypeString               = "STRING"
+	ResolvedTypeColor                = "COLOR"
+)
+
+type VariableScope string
+
+const (
+	// Valid scopes for FLOAT variables:
+	VariableScopeAllScopes        VariableScope = "ALL_SCOPES"
+	VariableScopeCornerRadius                   = "CORNER_RADIUS"
+	VariableScopeTextContent                    = "TEXT_CONTENT"
+	VariableScopeWidthHeight                    = "WIDTH_HEIGHT"
+	VariableScopeGap                            = "GAP"
+	VariableScopeStrokeFloat                    = "STROKE_FLOAT"
+	VariableScopeOpacity                        = "OPACITY"
+	VariableScopeEffectFloat                    = "EFFECT_FLOAT"
+	VariableScopeFontWeight                     = "FONT_WEIGHT"
+	VariableScopeFontSize                       = "FONT_SIZE"
+	VariableScopeLineHeight                     = "LINE_HEIGHT"
+	VariableScopeLetterSpacing                  = "LETTER_SPACING"
+	VariableScopeParagraphSpacing               = "PARAGRAPH_SPACING"
+	VariableScopeParagraphIndent                = "PARAGRAPH_INDENT"
+	// Valid scopes for STRING variables:
+	// VariableScopeAllScopes 	= "ALL_SCOPES"
+	// VariableScopeTextContent = "TEXT_CONTENT"
+	VariableScopeFontFamily     = "FONT_FAMILY"
+	VariableScopeFontStyle      = "FONT_STYLE"
+	VariableScopeFontVariations = "FONT_VARIATIONS"
+	// Valid scopes for COLOR variables:
+	// VariableScopeAllScopes = "ALL_SCOPES"
+	VariableScopeAllFills    = "ALL_FILLS"
+	VariableScopeFrameFill   = "FRAME_FILL"
+	VariableScopeShapeFill   = "SHAPE_FILL"
+	VariableScopeTextFill    = "TEXT_FILL"
+	VariableScopeStrokeColor = "STROKE_COLOR"
+	VariableScopeEffectColor = "EFFECT_COLOR"
+)
+
+type VariableCodeSyntax struct {
+	Web     string `json:"WEB"`
+	Android string `json:"ANDROID"`
+	Ios     string `json:"iOS"`
 }

@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"reflect"
 	"sort"
 	"strings"
 	"time"
@@ -28,6 +29,20 @@ func (figma *Figma) getUri() (string, error) {
 	// 	return "", parsingFailure
 	// }
 
+	t := fg.CreateTmpl("figma_uri", component_url)
+
+	var result bytes.Buffer
+
+	err := t.Execute(&result, figma)
+	if err != nil {
+		return "", err
+	}
+
+	return result.String(), nil
+}
+
+func (figma *Figma) getVariablesUri() (string, error) {
+	component_url := `https://api.figma.com/v1/files/{{.FILE_KEY}}/variables/local`
 	t := fg.CreateTmpl("figma_uri", component_url)
 
 	var result bytes.Buffer
@@ -83,6 +98,49 @@ func (f *Figma) GetData() (figma.File, error) {
 	return file, nil
 }
 
+func (f *Figma) GetVariablesData() (figma.Variables, error) {
+	var variables figma.Variables
+
+	// Create a new HTTP client with a timeout
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+
+	uri, uriError := f.getVariablesUri()
+	if uriError != nil {
+		return variables, uriError
+	}
+
+	req, requestError := http.NewRequest("GET", uri, nil)
+	if requestError != nil {
+		return variables, requestError
+	}
+
+	req.Header.Set("X-Figma-Token", f.API_KEY)
+
+	httpResp, httpError := client.Do(req)
+	if httpError != nil {
+		return variables, httpError
+	}
+
+	defer httpResp.Body.Close()
+
+	if httpResp.StatusCode != http.StatusOK {
+		return variables, fmt.Errorf("HTTP status code is %+v", httpResp.StatusCode)
+	}
+
+	body, readBodyError := io.ReadAll(httpResp.Body)
+	if readBodyError != nil {
+		return variables, readBodyError
+	}
+
+	if unmarshallingError := json.Unmarshal(body, &variables); unmarshallingError != nil {
+		return variables, unmarshallingError
+	}
+
+	return variables, nil
+}
+
 func (f *Figma) GetDataFromFile(path string) (figma.File, error) {
 	var file figma.File
 
@@ -100,6 +158,23 @@ func (f *Figma) GetDataFromFile(path string) (figma.File, error) {
 	return file, nil
 }
 
+func (f *Figma) GetVariablesFromFile(path string) (figma.Variables, error) {
+	var variables figma.Variables
+
+	data, err := os.ReadFile(path)
+	if err != nil {
+		fmt.Println("Error Reading Figma Variables:", err)
+		return variables, err
+	}
+
+	if unmarshallingError := json.Unmarshal(data, &variables); unmarshallingError != nil {
+		fmt.Println("Error Unmarshal Figma Variables:", unmarshallingError)
+		return variables, unmarshallingError
+	}
+
+	return variables, nil
+}
+
 func (f *Figma) Pages(file figma.File) []figma.Node {
 	var pages []figma.Node
 
@@ -108,17 +183,6 @@ func (f *Figma) Pages(file figma.File) []figma.Node {
 	}
 
 	return pages
-}
-
-func (f *Figma) Normalise(file figma.File) {
-	fmt.Printf("[FILE] : %v \n\n", file)
-	// componentSets := file.ComponentSets
-	// component := file.Components
-	// styles := file.Styles
-	// tokens := make(map[string]figma.Token)
-	pages := f.Pages(file)
-
-	fmt.Printf("[PAGES] : %+v \n\n", pages)
 }
 
 func (f *Figma) ParseTokens(file figma.File) map[string]figma.Token {
@@ -132,7 +196,6 @@ func (f *Figma) ParseTokens(file figma.File) map[string]figma.Token {
 		for _, node := range children {
 			f.mapTokens(node, &styles, &tokens)
 		}
-		// fmt.Printf("[tokens] : %+v \n\n", tokens)
 	}
 
 	return tokens
@@ -233,10 +296,9 @@ func (f *Figma) GenerateTokensCSS(tokens map[string]figma.Token) (string, error)
 			sort.Slice(rules, func(i, j int) bool {
 				return strings.ToLower(rules[i]) < strings.ToLower(rules[j])
 			})
-			tk[token.Theme] = rules
+			tk[token.Theme] = removeDuplicates(rules)
 		} else if _, exists := tk[token.ClassName]; !exists && token.ClassName != "" {
 			tk[token.ClassName] = strings.Split(token.Value, "|")
-			// fmt.Printf("[PORRA] : %+v \n\n", token)
 		}
 	}
 
@@ -248,4 +310,91 @@ func (f *Figma) GenerateTokensCSS(tokens map[string]figma.Token) (string, error)
 	}
 
 	return out.String(), nil
+}
+
+func (f *Figma) ParseVariables(variables figma.Variables) map[string]figma.Token {
+	collections := variables.Meta.VariableCollections
+	vars := variables.Meta.Variables
+	tokens := make(map[string]figma.Token)
+	themes := getVariablesThemes(collections)
+
+	if len(collections) == 0 || len(vars) == 0 {
+		return tokens
+	}
+
+	for _, v := range vars {
+		if (v.ResolvedType == fg.ResolvedTypeColor || v.ResolvedType == fg.ResolvedTypeFloat) && !v.DeletedButReferenced {
+			collectionName := fg.ToKebabCase(collections[v.VariableCollectionId].Name)
+			varName := fg.ToKebabCase(v.Name)
+
+			for key, value := range v.ValuesByMode {
+				result := ""
+				theme := themes[key]
+				switch reflect.TypeOf(value).Kind() {
+				case reflect.Float64:
+					result = fmt.Sprintf("%vpx", value)
+				case reflect.Map:
+					jsonData, _ := json.Marshal(value) // encode back to JSON
+
+					var color fg.Color
+					var alias fg.VariableAlias
+
+					json.Unmarshal(jsonData, &alias)
+					json.Unmarshal(jsonData, &color)
+
+					result = color.Rgba()
+
+					if alias.ID != "" && vars[alias.ID].VariableCollectionId != "" {
+						prefix := fg.ToKebabCase(collections[vars[alias.ID].VariableCollectionId].Name)
+						result = fmt.Sprintf("var(--%v-%v)", prefix, fg.ToKebabCase(vars[alias.ID].Name))
+					}
+				}
+
+				if result != "" {
+					token := figma.Token{
+						Name:     v.Name,
+						Variable: fmt.Sprintf("--%v-%v", collectionName, varName),
+						Value:    result,
+						Theme:    theme,
+					}
+
+					tokens[v.ID] = token
+				}
+			}
+		}
+	}
+
+	return tokens
+}
+
+func getVariablesThemes(collections map[string]fg.VariableCollection) map[string]string {
+	themes := make(map[string]string)
+
+	for _, c := range collections {
+		for _, mode := range c.Modes {
+			name := ":root"
+			if strings.HasSuffix(strings.ToLower(mode.Name), "theme") {
+				name = fg.ToKebabCase(mode.Name)
+			}
+
+			themes[mode.ModeId] = name
+		}
+	}
+
+	return themes
+}
+
+// TODO: move this functions to a common place
+func removeDuplicates(input []string) []string {
+	seen := make(map[string]bool)
+	var result []string
+
+	for _, val := range input {
+		if !seen[val] {
+			seen[val] = true
+			result = append(result, val)
+		}
+	}
+
+	return result
 }

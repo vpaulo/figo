@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"maps"
 
 	"github.com/vpaulo/figo"
 )
@@ -26,11 +27,21 @@ func main() {
 		return
 	}
 
-	// TODO: GetVariables
+	// Get Figma Variables from JSON file(API response saved in a JSON file)
+	variables, err := figma.GetVariablesFromFile("./tmp/variable_output.json")
+	if err != nil {
+		fmt.Println("Error fetching Figma Variables:", err)
+		return
+	}
 
+	// Tokens from Variables API
+	variableTokens := figma.ParseVariables(variables)
+
+	// Tokens from File API
 	tokens := figma.ParseTokens(file)
 
-	// TODO: ParseVariablesTokens
+	// Merge both tokens
+	maps.Copy(tokens, variableTokens)
 
 	tokensCSS, err := figma.GenerateTokensCSS(tokens)
 	if err != nil {
