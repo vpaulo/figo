@@ -11,6 +11,7 @@ func main() {
 	figma := figo.Figma{
 		FILE_KEY: "FIGMA_FILE",
 		API_KEY:  "YOUR_API_KEY",
+		Prefix:   "vp",
 	}
 
 	// Get Figma data from API
@@ -43,9 +44,14 @@ func main() {
 	// Merge both tokens
 	maps.Copy(tokens, variableTokens)
 
-	tokensCSS, err := figma.GenerateTokensCSS(tokens)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("[tokensCSS] : %+v \n\n", tokensCSS)
+	// tokensCSS, err := figma.GenerateTokensCSS(tokens)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// css := figma.ParseCSS(file, tokens)
+	components := figma.ParseComponents(file, tokens)
+	fmt.Printf("[COMPONENTS] : %+v \n\n", components)
+	// fmt.Printf("[tokensCSS] : %+v \n\n", tokensCSS)
+	// fmt.Printf("[CSS] : %+v \n\n", css)
 }

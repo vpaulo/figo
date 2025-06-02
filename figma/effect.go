@@ -10,9 +10,9 @@ func (e *Effect) Value() string {
 	case EffectTypeDropShadow:
 		value = e.Shadow()
 	case EffectTypeLayerBlur:
-		value = ""
+		value = fmt.Sprintf("blur(%vpx)", int(e.Radius))
 	case EffectTypeBackgroundBlur:
-		value = ""
+		value = fmt.Sprintf("blur(%vpx)", int(e.Radius))
 	}
 	return value
 }
