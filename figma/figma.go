@@ -38,90 +38,91 @@ type Node struct {
 	Type     NodeType `json:"type"`
 	ID       string   `json:"id"`
 	Name     string   `json:"name"`
-	Visible  bool     `json:"visible,omitempty"`
+	Visible  *bool    `json:"visible,omitzero" default:"true"`
 	Children []Node   `json:"children"`
+	Rotation float64  `json:"rotation"`
 	// CANVAS
 	BackgroundColor Color           `json:"backgroundColor"`
-	ExportSettings  []ExportSetting `json:"exportSettings,omitempty"`
+	ExportSettings  []ExportSetting `json:"exportSettings,omitzero"`
 	// FRAME
-	Fills                   []Paint           `json:"fills,omitempty"`
-	Strokes                 []Paint           `json:"strokes,omitempty"`
-	StrokeWeight            float64           `json:"strokeWeight,omitempty"`
-	StrokeAlign             StrokeAlign       `json:"strokeAlign,omitempty"`
-	StrokeDashes            []float64         `json:"strokeDashes,omitempty"`
-	CornerRadius            float64           `json:"cornerRadius,omitempty"`
-	RectangleCornerRadii    []float64         `json:"rectangleCornerRadii,omitempty"`
-	CornerSmoothing         float64           `json:"cornerSmoothing,omitempty"`
-	BlendMode               BlendMode         `json:"blendMode,omitempty"`
-	PreserveRatio           bool              `json:"preserveRatio,omitempty"`
+	Fills                   []Paint           `json:"fills,omitzero"`
+	Strokes                 []Paint           `json:"strokes,omitzero"`
+	StrokeWeight            float64           `json:"strokeWeight,omitzero"`
+	StrokeAlign             StrokeAlign       `json:"strokeAlign,omitzero"`
+	StrokeDashes            []float64         `json:"strokeDashes,omitzero"`
+	CornerRadius            float64           `json:"cornerRadius,omitzero"`
+	RectangleCornerRadii    []float64         `json:"rectangleCornerRadii,omitzero"`
+	CornerSmoothing         float64           `json:"cornerSmoothing,omitzero"`
+	BlendMode               BlendMode         `json:"blendMode,omitzero"`
+	PreserveRatio           bool              `json:"preserveRatio,omitzero"`
 	TargetAspectRatio       Vector            `json:"targetAspectRatio"`
 	Constraints             LayoutConstraint  `json:"constraints"`
-	LayoutAlign             LayoutAlign       `json:"layoutAlign,omitempty"`
-	Opacity                 float64           `json:"opacity,omitempty"`
+	LayoutAlign             LayoutAlign       `json:"layoutAlign,omitzero"`
+	Opacity                 float64           `json:"opacity,omitzero" default:"1"`
 	AbsoluteBoundingBox     Rectangle         `json:"absoluteBoundingBox"`
 	AbsoluteRenderBounds    Rectangle         `json:"absoluteRenderBounds"`
 	Size                    Vector            `json:"size"`
-	MinWidth                float64           `json:"minWidth,omitempty"`
-	MaxWidth                float64           `json:"maxWidth,omitempty"`
-	MinHeight               float64           `json:"minHeight,omitempty"`
-	MaxHeight               float64           `json:"maxHeight,omitempty"`
-	RelativeTransform       Transform         `json:"relativeTransform,omitempty"`
-	ClipsContent            bool              `json:"clipsContent,omitempty"`
-	LayoutMode              LayoutMode        `json:"layoutMode,omitempty"`
-	LayoutSizingHorizontal  LayoutSizing      `json:"layoutSizingHorizontal,omitempty"`
-	LayoutSizingVertical    LayoutSizing      `json:"layoutSizingVertical,omitempty"`
-	LayoutWrap              LayoutWrap        `json:"layoutWrap,omitempty"`
-	PrimaryAxisSizingMode   SizingMode        `json:"primaryAxisSizingMode,omitempty"`
-	CounterAxisSizingMode   SizingMode        `json:"counterAxisSizingMode,omitempty"`
-	PrimaryAxisAlignItems   AlignItems        `json:"primaryAxisAlignItems,omitempty"`
-	CounterAxisAlignItems   AlignItems        `json:"counterAxisAlignItems,omitempty"`
-	CounterAxisAlignContent AlignContent      `json:"counterAxisAlignContent,omitempty"`
-	PaddingLeft             float64           `json:"paddingLeft,omitempty"`
-	PaddingRight            float64           `json:"paddingRight,omitempty"`
-	PaddingTop              float64           `json:"paddingTop,omitempty"`
-	PaddingBottom           float64           `json:"paddingBottom,omitempty"`
-	ItemSpacing             float64           `json:"itemSpacing,omitempty"`
-	CounterAxisSpacing      float64           `json:"counterAxisSpacing,omitempty"`
-	LayoutPositioning       LayoutPositioning `json:"layoutPositioning,omitempty"`
-	ItemReverseZIndex       bool              `json:"itemReverseZIndex,omitempty"`
-	StrokesIncludedInLayout bool              `json:"strokesIncludedInLayout,omitempty"`
-	LayoutGrids             []LayoutGrid      `json:"layoutGrids,omitempty"`
-	OverflowDirection       OverflowDirection `json:"overflowDirection,omitempty"`
-	Effects                 []Effect          `json:"effects,omitempty"`
-	IsMask                  bool              `json:"isMask,omitempty"`
-	MaskType                MaskType          `json:"maskType,omitempty"`
+	MinWidth                float64           `json:"minWidth,omitzero"`
+	MaxWidth                float64           `json:"maxWidth,omitzero"`
+	MinHeight               float64           `json:"minHeight,omitzero"`
+	MaxHeight               float64           `json:"maxHeight,omitzero"`
+	RelativeTransform       Transform         `json:"relativeTransform,omitzero"`
+	ClipsContent            bool              `json:"clipsContent,omitzero"`
+	LayoutMode              LayoutMode        `json:"layoutMode,omitzero" default:"NONE"`
+	LayoutSizingHorizontal  LayoutSizing      `json:"layoutSizingHorizontal,omitzero"`
+	LayoutSizingVertical    LayoutSizing      `json:"layoutSizingVertical,omitzero"`
+	LayoutWrap              LayoutWrap        `json:"layoutWrap,omitzero" default:"NO_WRAP"`
+	PrimaryAxisSizingMode   SizingMode        `json:"primaryAxisSizingMode,omitzero" default:"AUTO"`
+	CounterAxisSizingMode   SizingMode        `json:"counterAxisSizingMode,omitzero" default:"AUTO"`
+	PrimaryAxisAlignItems   AlignItems        `json:"primaryAxisAlignItems,omitzero" default:"MIN"`
+	CounterAxisAlignItems   AlignItems        `json:"counterAxisAlignItems,omitzero" default:"MIN"`
+	CounterAxisAlignContent AlignContent      `json:"counterAxisAlignContent,omitzero" default:"AUTO"`
+	PaddingLeft             float64           `json:"paddingLeft,omitzero"`
+	PaddingRight            float64           `json:"paddingRight,omitzero"`
+	PaddingTop              float64           `json:"paddingTop,omitzero"`
+	PaddingBottom           float64           `json:"paddingBottom,omitzero"`
+	ItemSpacing             float64           `json:"itemSpacing,omitzero"`
+	CounterAxisSpacing      float64           `json:"counterAxisSpacing,omitzero"`
+	LayoutPositioning       LayoutPositioning `json:"layoutPositioning,omitzero" default:"AUTO"`
+	ItemReverseZIndex       bool              `json:"itemReverseZIndex,omitzero"`
+	StrokesIncludedInLayout bool              `json:"strokesIncludedInLayout,omitzero"`
+	LayoutGrids             []LayoutGrid      `json:"layoutGrids,omitzero"`
+	OverflowDirection       OverflowDirection `json:"overflowDirection,omitzero" default:"NONE"`
+	Effects                 []Effect          `json:"effects,omitzero"`
+	IsMask                  bool              `json:"isMask,omitzero"`
+	MaskType                MaskType          `json:"maskType,omitzero"`
 	// TODO: this (StyleType) does not seem to match the values returned
-	Styles map[StyleType]string `json:"styles,omitempty"`
+	Styles map[StyleType]string `json:"styles,omitzero"`
 	// SECTION
-	SectionContentsHidden bool `json:"sectionContentsHidden,omitempty"`
+	SectionContentsHidden bool `json:"sectionContentsHidden,omitzero"`
 	// VECTOR
-	LayoutGrow              float64                   `json:"layoutGrow,omitempty"`
-	FillGeometry            []Path                    `json:"fillGeometry,omitempty"`
-	FillOverrideTable       map[float64]PaintOverride `json:"fillOverrideTable,omitempty"`
+	LayoutGrow              float64                   `json:"layoutGrow,omitzero"`
+	FillGeometry            []Path                    `json:"fillGeometry,omitzero"`
+	FillOverrideTable       map[float64]PaintOverride `json:"fillOverrideTable,omitzero"`
 	IndividualStrokeWeights StrokeWeights             `json:"individualStrokeWeights"`
-	StrokeCap               StrokeCap                 `json:"strokeCap,omitempty"`
-	StrokeJoin              StrokeJoin                `json:"strokeJoin,omitempty"`
-	StrokeMiterAngle        float64                   `json:"strokeMiterAngle,omitempty"`
-	StrokeGeometry          []Path                    `json:"strokeGeometry,omitempty"`
+	StrokeCap               StrokeCap                 `json:"strokeCap,omitzero" default:"NONE"`
+	StrokeJoin              StrokeJoin                `json:"strokeJoin,omitzero" default:"MITTER"`
+	StrokeMiterAngle        float64                   `json:"strokeMiterAngle,omitzero" default:"28.96"`
+	StrokeGeometry          []Path                    `json:"strokeGeometry,omitzero"`
 	// BOOLEAN_OPERATION
-	BooleanOperation BooleanOperation `json:"booleanOperation,omitempty"`
+	BooleanOperation BooleanOperation `json:"booleanOperation,omitzero"`
 	// ELLIPSE
 	ArcData ArcData `json:"arcData"`
 	// TEXT
-	Characters              string               `json:"characters,omitempty"`
+	Characters              string               `json:"characters,omitzero"`
 	Style                   TypeStyle            `json:"style"`
-	CharacterStyleOverrides []float64            `json:"characterStyleOverrides,omitempty"`
-	StyleOverrideTable      map[string]TypeStyle `json:"styleOverrideTable,omitempty"`
-	LineTypes               []LineTypes          `json:"lineTypes,omitempty"`
-	LineIndentations        []float64            `json:"lineIndentations,omitempty"`
+	CharacterStyleOverrides []float64            `json:"characterStyleOverrides,omitzero"`
+	StyleOverrideTable      map[string]TypeStyle `json:"styleOverrideTable,omitzero"`
+	LineTypes               []LineTypes          `json:"lineTypes,omitzero"`
+	LineIndentations        []float64            `json:"lineIndentations,omitzero"`
 	// COMPONENT
-	ComponentPropertyDefinitions map[string]ComponentPropertyDefinition `json:"componentPropertyDefinitions,omitempty"`
+	ComponentPropertyDefinitions map[string]ComponentPropertyDefinition `json:"componentPropertyDefinitions,omitzero"`
 	// INSTANCE
-	ComponentId         string                       `json:"componentId,omitempty"`
-	IsExposedInstance   bool                         `json:"isExposedInstance,omitempty"`
-	ExposedInstances    []string                     `json:"exposedInstances,omitempty"`
-	ComponentProperties map[string]ComponentProperty `json:"componentProperties,omitempty"`
-	Overrides           []Overrides                  `json:"overrides,omitempty"`
+	ComponentId         string                       `json:"componentId,omitzero"`
+	IsExposedInstance   bool                         `json:"isExposedInstance,omitzero"`
+	ExposedInstances    []string                     `json:"exposedInstances,omitzero"`
+	ComponentProperties map[string]ComponentProperty `json:"componentProperties,omitzero"`
+	Overrides           []Overrides                  `json:"overrides,omitzero"`
 }
 
 type ComponentSet struct {
@@ -189,8 +190,8 @@ const (
 
 type Paint struct {
 	Type                    PaintType                `json:"type"`
-	Visible                 bool                     `json:"visible"`
-	Opacity                 float64                  `json:"opacity"`
+	Visible                 *bool                    `json:"visible" default:"true"`
+	Opacity                 float64                  `json:"opacity" default:"1"`
 	Color                   Color                    `json:"color"`
 	BlendMode               BlendMode                `json:"blendMode"`
 	GradientHandlePositions []Vector                 `json:"gradientHandlePositions"`
@@ -419,7 +420,7 @@ const (
 type LayoutGrid struct {
 	Pattern        Pattern                  `json:"pattern"`
 	SectionSize    float64                  `json:"sectionSize"`
-	Visible        bool                     `json:"visible"`
+	Visible        *bool                    `json:"visible" default:"true"`
 	Color          Color                    `json:"color"`
 	Alignment      Alignment                `json:"alignment"`
 	GutterSize     float64                  `json:"gutterSize"`
@@ -447,7 +448,7 @@ const (
 type Effect struct {
 	Type                 EffectType               `json:"type"`
 	Pattern              Pattern                  `json:"pattern"`
-	Visible              bool                     `json:"visible"`
+	Visible              *bool                    `json:"visible" default:"true"`
 	Radius               float64                  `json:"radius"`
 	Color                Color                    `json:"color"`
 	BlendMode            BlendMode                `json:"blendMode"`
@@ -645,8 +646,8 @@ const (
 type ComponentPropertyDefinition struct {
 	Type            ComponentPropertyType `json:"type"`
 	DefaultValue    string                `json:"defaultValue"`
-	VariantOptions  []string              `json:"variantOptions,omitempty"`
-	PreferredValues StyleType             `json:"preferredValues,omitempty"`
+	VariantOptions  []string              `json:"variantOptions,omitzero"`
+	PreferredValues StyleType             `json:"preferredValues,omitzero"`
 }
 
 type ComponentPropertyType string
@@ -661,7 +662,7 @@ const (
 type ComponentProperty struct {
 	Type            ComponentPropertyType    `json:"type"`
 	Value           string                   `json:"value"`
-	PreferredValues StyleType                `json:"preferredValues,omitempty"`
+	PreferredValues StyleType                `json:"preferredValues,omitzero"`
 	BoundVariables  map[string]VariableAlias `json:"boundVariables"`
 }
 
@@ -767,4 +768,14 @@ type VariableCodeSyntax struct {
 	Web     string `json:"WEB"`
 	Android string `json:"ANDROID"`
 	Ios     string `json:"iOS"`
+}
+
+type Element struct {
+	Name     string
+	Styles   map[string]string
+	Children []Element
+	// Tag  string
+	// Classes []string
+	// Css  string
+	// Html string
 }
