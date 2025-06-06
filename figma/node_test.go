@@ -2,6 +2,7 @@ package figma
 
 import (
 	"maps"
+	"slices"
 	"testing"
 )
 
@@ -693,5 +694,135 @@ func TestNodeCss(t *testing.T) {
 	}
 	if !maps.Equal(ans, want) {
 		t.Errorf("%+v = %v; want %v", "Css", ans, want)
+	}
+}
+
+// TODO TextCss
+// TODO Variants
+
+// name -> .name
+// property=value -> [property="value"]
+// property=pseudo -> :pseudo
+// property=value;pseudo -> [property="value"]:pseudo
+// property=value;class -> [property="value"].class
+func TestNodeClasses(t *testing.T) {
+	var node Node
+	var ans []string
+	var want []string
+
+	node = Node{
+		Type: NodeTypeFrame,
+		Name: "my-component",
+	}
+
+	ans = node.Classes()
+	want = []string{".my-component"}
+	if !slices.Equal(ans, want) {
+		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
+	}
+
+	node.Name = "myComponent"
+	ans = node.Classes()
+	want = []string{".my-component"}
+	if !slices.Equal(ans, want) {
+		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
+	}
+
+	node.Name = "type=default"
+	ans = node.Classes()
+	want = []string{}
+	if !slices.Equal(ans, want) {
+		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
+	}
+
+	node.Name = "type=test"
+	ans = node.Classes()
+	want = []string{"[type=\"test\"]"}
+	if !slices.Equal(ans, want) {
+		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
+	}
+
+	node.Name = "type=hover"
+	ans = node.Classes()
+	want = []string{":hover"}
+	if !slices.Equal(ans, want) {
+		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
+	}
+
+	node.Name = "type=test,state=ok"
+	ans = node.Classes()
+	want = []string{"[type=\"test\"]", "[state=\"ok\"]"}
+	if !slices.Equal(ans, want) {
+		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
+	}
+
+	node.Name = "type=test,state=hover"
+	ans = node.Classes()
+	want = []string{"[type=\"test\"]", ":hover"}
+	if !slices.Equal(ans, want) {
+		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
+	}
+
+	node.Name = "state=hover, type=test"
+	ans = node.Classes()
+	want = []string{"[type=\"test\"]", ":hover"}
+	if !slices.Equal(ans, want) {
+		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
+	}
+
+	node.Name = "state=default;hover, type=test"
+	ans = node.Classes()
+	want = []string{"[type=\"test\"]", ":hover"}
+	if !slices.Equal(ans, want) {
+		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
+	}
+
+	node.Name = "type=test,state=default"
+	ans = node.Classes()
+	want = []string{"[type=\"test\"]"}
+	if !slices.Equal(ans, want) {
+		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
+	}
+
+	node.Name = "type=test;hover"
+	ans = node.Classes()
+	want = []string{"[type=\"test\"]", ":hover"}
+	if !slices.Equal(ans, want) {
+		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
+	}
+
+	node.Name = "type=test;ok"
+	ans = node.Classes()
+	want = []string{"[type=\"test\"].ok"}
+	if !slices.Equal(ans, want) {
+		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
+	}
+
+	node.Name = "type=test,hover=true"
+	ans = node.Classes()
+	want = []string{"[type=\"test\"]", ":hover"}
+	if !slices.Equal(ans, want) {
+		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
+	}
+
+	node.Name = "type=test,hover=false"
+	ans = node.Classes()
+	want = []string{"[type=\"test\"]"}
+	if !slices.Equal(ans, want) {
+		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
+	}
+
+	node.Name = "hover=true"
+	ans = node.Classes()
+	want = []string{":hover"}
+	if !slices.Equal(ans, want) {
+		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
+	}
+
+	node.Name = "hover=false"
+	ans = node.Classes()
+	want = []string{}
+	if !slices.Equal(ans, want) {
+		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 }

@@ -2,6 +2,7 @@ package figma
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 )
 
@@ -23,6 +24,10 @@ func (n *Node) IsInstance() bool {
 
 func (n *Node) IsText() bool {
 	return n.Type == NodeTypeText
+}
+
+func (n *Node) IsVector() bool {
+	return n.Type == NodeTypeVector
 }
 
 func (n *Node) IsAutoLayout() bool {
@@ -432,77 +437,215 @@ func (n *Node) TextCss() map[string]string {
 		rules["letter-spacing"] = fmt.Sprintf("%vpx", int(n.Style.LetterSpacing))
 	}
 
-	// if !self.text_colour().is_empty() {
-	//            rules.insert("color".to_string(), self.text_colour());
-	//        }
+	switch n.Style.TextAlignHorizontal {
+	case TextAlignRight:
+		rules["text-align"] = "right"
+	case TextAlignCenter:
+		rules["text-align"] = "center"
+	case TextAlignJustified:
+		rules["text-align"] = "justify"
+	}
 
-	//        if !style.font_family.is_empty() {
-	//            rules.insert("font-family".to_string(), style.font_family.to_string());
-	//        }
+	switch n.Style.TextDecoration {
+	case TextDecorationStrikethrough:
+		rules["text-decoration-line"] = "strikethrough"
+	case TextDecorationUnderline:
+		rules["text-decoration-line"] = "underline"
+	}
 
-	//        if style.font_size != 0.0 {
-	//            rules.insert("font-size".to_string(), format!("{:.0}px", style.font_size));
-	//        }
+	switch n.Style.TextCase {
+	case TextCaseUpper:
+		rules["text-transform"] = "uppercase"
+	case TextCaseLower:
+		rules["text-transform"] = "lowercase"
+	case TextCaseTitle:
+		rules["text-transform"] = "capitalize"
+	case TextCaseSmallCaps:
+		rules["font-variant"] = "small-caps"
+	case TextCaseSmallCapsForced:
+		rules["font-variant"] = "all-small-caps"
+	}
 
-	//        if style.font_weight != 0.0 {
-	//            rules.insert(
-	//                "font-weight".to_string(),
-	//                format!("{:.0}", style.font_weight),
-	//            );
-	//        }
+	if n.Style.TextTruncation != "" {
+		rules["text-overflow"] = "ellipsis"
 
-	//        if style.line_height() > 0.0 {
-	//            rules.insert(
-	//                "line-height".to_string(),
-	//                format!("{}", style.line_height()),
-	//            );
-	//        }
+		if n.Style.MaxLines != 0.0 {
+			rules["-webkit-box-orient"] = "vertical"
+			rules["-webkit-line-clamp"] = fmt.Sprintf("%v", int(n.Style.MaxLines))
+		}
+	}
 
-	//        if style.letter_spacing != 0.0 {
-	//            rules.insert(
-	//                "letter-spacing".to_string(),
-	//                format!("{:.0}px", style.letter_spacing),
-	//            );
-	//        }
+	if n.Background() != "" {
+		rules["color"] = n.Background()
+	}
 
-	//        if !self.sizes().is_empty() {
-	//            for (key, value) in self.sizes().iter() {
-	//                rules.insert(key.to_string(), value.to_string());
-	//            }
-	//        }
+	if n.MinWidth != 0.0 {
+		rules["min-width"] = fmt.Sprintf("%vpx", int(n.MinWidth))
+	}
 
-	//        if !style.text_align().is_empty() {
-	//            rules.insert("text-align".to_string(), format!("{}", style.text_align()));
-	//        }
+	if n.MaxWidth != 0.0 {
+		rules["max-width"] = fmt.Sprintf("%vpx", int(n.MinWidth))
+	}
 
-	//        if !style.text_decoration().is_empty() {
-	//            rules.insert(
-	//                "text-decoration-line".to_string(),
-	//                format!("{}", style.text_decoration()),
-	//            );
-	//        }
+	if n.MinHeight != 0.0 {
+		rules["min-height"] = fmt.Sprintf("%vpx", int(n.MinWidth))
+	}
 
-	//        if !style.text_transform().is_empty() {
-	//            rules.insert(
-	//                "text-transform".to_string(),
-	//                format!("{}", style.text_transform()),
-	//            );
-	//        }
+	if n.MaxHeight != 0.0 {
+		rules["max-height"] = fmt.Sprintf("%vpx", int(n.MinWidth))
+	}
 
-	//        if !style.font_variant().is_empty() {
-	//            rules.insert(
-	//                "font-variant".to_string(),
-	//                format!("{}", style.font_variant()),
-	//            );
-	//        }
+	if n.LayoutSizingHorizontal == LayoutSizingFixed {
+		rules["width"] = fmt.Sprintf("%vpx", int(n.AbsoluteBoundingBox.Width))
+	}
 
-	//        if style.text_truncation == TextTruncation::Ending {
-	//            rules.insert("text-overflow".to_string(), "ellipsis".to_string());
+	if n.LayoutSizingHorizontal == LayoutSizingHug {
+		rules["width"] = "fit-content"
+	}
 
-	//            if let Some(max) = style.max_lines {
-	//                rules.insert("-webkit-box-orient".to_string(), "vertical".to_string());
-	//                rules.insert("-webkit-line-clamp".to_string(), format!("{:.0}", max));
-	//            }
-	//        }
+	if n.LayoutSizingHorizontal == LayoutSizingFill {
+		rules["width"] = "100%"
+	}
+
+	if n.LayoutSizingVertical == LayoutSizingFixed {
+		rules["height"] = fmt.Sprintf("%vpx", int(n.AbsoluteBoundingBox.Width))
+	}
+
+	if n.LayoutSizingVertical == LayoutSizingHug {
+		rules["height"] = "fit-content"
+	}
+
+	if n.LayoutSizingVertical == LayoutSizingFill {
+		rules["height"] = "100%"
+	}
+
 	return rules
+}
+
+func (n *Node) Variants() []Variant {
+	var variants []Variant
+
+	for key, def := range n.ComponentPropertyDefinitions {
+		if def.Type == ComponentPropertyTypeVariant {
+			variant := Variant{
+				Name:    key,
+				Value:   def.DefaultValue,
+				Options: def.VariantOptions,
+			}
+
+			variants = append(variants, variant)
+		}
+	}
+
+	return variants
+}
+
+func (n *Node) Classes() []string {
+	var classes []string
+
+	if strings.Contains(n.Name, ",") {
+		variants := strings.Split(n.Name, ",")
+		var pseudoArr []string
+
+		for i, variant := range variants {
+			variants[i] = strings.TrimSpace(variant)
+
+			attribute := getVariantClasses(variants[i])
+			if attribute != "" {
+				classes = append(classes, attribute)
+			}
+
+			pseudo := getPseudoClasses(variants[i])
+			if pseudo != "" {
+				pseudoArr = append(pseudoArr, pseudo)
+			}
+		}
+		classes = append(classes, pseudoArr...)
+	} else if strings.Contains(n.Name, "=") {
+		attribute := getVariantClasses(n.Name)
+		pseudo := getPseudoClasses(n.Name)
+		if attribute != "" {
+			classes = append(classes, attribute)
+		}
+		if pseudo != "" {
+			classes = append(classes, pseudo)
+		}
+	} else {
+		classes = []string{fmt.Sprintf(".%v", ToKebabCase(n.Name))}
+	}
+
+	return classes
+}
+
+var pseudoClasses = []string{
+	"hover",
+	"active",
+	"focus",
+	"disabled",
+	"focus-visible",
+	"focus-within",
+}
+
+func getVariantClasses(variant string) string {
+	parts := strings.Split(variant, "=")
+	if len(parts) == 2 && parts[0] != "" && parts[1] != "" {
+		attribute := ToKebabCase(parts[0])
+		value := ToKebabCase(parts[1])
+
+		if slices.Contains(pseudoClasses, attribute) {
+			return ""
+		}
+
+		valueParts := strings.Split(value, ";")
+		if len(valueParts) == 2 && valueParts[0] != "" && valueParts[1] != "" {
+			val := ToKebabCase(valueParts[0])
+			second := ToKebabCase(valueParts[1])
+			cl := ""
+
+			if second != "default" && !slices.Contains(pseudoClasses, second) {
+				cl = fmt.Sprintf(".%v", second)
+			}
+
+			if val == "default" {
+				return fmt.Sprintf("%v", cl)
+			}
+
+			return fmt.Sprintf("[%v=\"%v\"]%v", attribute, val, cl)
+		}
+
+		if value != "default" && !slices.Contains(pseudoClasses, value) {
+			return fmt.Sprintf("[%v=\"%v\"]", attribute, value)
+		}
+	}
+
+	return ""
+}
+
+func getPseudoClasses(variant string) string {
+	parts := strings.Split(variant, "=")
+	if len(parts) == 2 && parts[0] != "" && parts[1] != "" {
+		attribute := ToKebabCase(parts[0])
+		value := ToKebabCase(parts[1])
+
+		valueParts := strings.Split(value, ";")
+		if len(valueParts) == 2 && valueParts[1] != "" {
+			pseudo := ToKebabCase(valueParts[1])
+
+			if pseudo != "default" && slices.Contains(pseudoClasses, pseudo) {
+				return fmt.Sprintf(":%v", pseudo)
+			}
+
+			return ""
+		}
+
+		if value != "default" && slices.Contains(pseudoClasses, value) {
+			return fmt.Sprintf(":%v", value)
+		}
+
+		if slices.Contains(pseudoClasses, attribute) && value == "true" {
+			return fmt.Sprintf(":%v", attribute)
+		}
+	}
+
+	return ""
 }
