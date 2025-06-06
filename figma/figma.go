@@ -771,11 +771,19 @@ type VariableCodeSyntax struct {
 }
 
 type Element struct {
-	Name     string
-	Styles   map[string]string
-	Children []Element
+	Name       string
+	Styles     map[string]string
+	Children   []Element
+	Variants   []Variant
+	Attributes []string
 	// Tag  string
 	// Classes []string
 	// Css  string
 	// Html string
+}
+
+type Variant struct {
+	Name    string
+	Value   string
+	Options []string
 }

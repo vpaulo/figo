@@ -421,7 +421,7 @@ func (f *Figma) ParseComponents(file figma.File, tokens map[string]figma.Token) 
 				element := components[node.ID]
 				components[node.ID] = f.generateComponent(node.ID, node, figma.Node{}, &components, element, &tokens)
 
-				fmt.Printf("[yyy] : %+v \n\n", components[node.ID])
+				// fmt.Printf("[yyy] : %+v \n\n", components[node.ID])
 			}
 		}
 	}
@@ -454,79 +454,77 @@ func (f *Figma) initElementData(file figma.File) map[string]fg.Element {
 }
 
 func (f *Figma) generateComponent(id string, node figma.Node, parent figma.Node, components *map[string]fg.Element, element fg.Element, tokens *map[string]figma.Token) fg.Element {
-	if /*node.IsFrame() &&*/ id == "234:264" {
-		// var styles map[string]string
+	// if id != "505:17" {
+	// 	return element
+	// }
+	// if /*node.IsFrame() &&*/ id == "234:264" {
+	var el fg.Element
 
-		var entry fg.Element
+	entry, ok := (*components)[node.ID]
 
-		entry, ok := (*components)[node.ID]
-
-		var el fg.Element
-
-		// First we get a "copy" of the entry
-		// if c, ok := (*components)[node.ID]; ok {
-
-		// 	// Then we modify the copy
-		// 	entry = c
-
-		// 	// Then we reassign map entry
-		// 	// myMap["key"] = entry
-		// }
-		//
-
-		if ok {
-			fmt.Printf("[IS COMPONENT] : %+v \n\n", entry.Name)
-			el = entry
-		} else {
-			fmt.Printf("[NOT COMPONENT] : %+v \n\n", node.Name)
-			el = fg.Element{
-				Name: fmt.Sprintf("%v", fg.ToKebabCase(node.Name)),
-			}
+	if ok {
+		fmt.Printf("[IS COMPONENT] : %+v \n\n", entry.Name)
+		el = entry
+	} else {
+		fmt.Printf("[NOT COMPONENT] : %+v \n\n", node.Name)
+		el = fg.Element{
+			Name: fmt.Sprintf("%v", fg.ToKebabCase(node.Name)),
 		}
-
-		fmt.Printf("[ELEMENT] : %+v \n\n", el)
-
-		if node.IsComponentSet() {
-			fmt.Printf("[COMPONENT_SET] : %+v \n\n", (*components)[node.ID].Name)
-		}
-		if node.IsInstance() {
-			fmt.Printf("[INSTANCE] : %+v \n\n", (*components)[node.ID].Name)
-		}
-		if node.IsComponent() {
-			fmt.Printf("[COMPONENT] : %+v \n\n", (*components)[node.ID].Name)
-		}
-		if !node.IsComponentSet() && !node.IsInstance() && !node.IsComponent() {
-			fmt.Printf("[FRAME] : %+v \n\n", node.Name)
-		}
-
-		if !node.IsComponentSet() && !node.IsInstance() {
-			el.Styles = node.Css(parent)
-		}
-		if node.IsText() {
-			ts := node.TextCss()
-			fmt.Printf("[TEXT] : %+v \n\n", ts)
-		}
-		fmt.Printf("[STYLES] : %+v \n\n", el.Styles)
-
-		for _, child := range node.Children {
-			// if child.IsText() {
-			// 	fmt.Printf("[TEXT] : %+v \n\n", child.Name)
-			// } else {
-			element = f.generateComponent(id, child, node, components, el, tokens)
-			// }
-		}
-
-		if !ok {
-			element.Children = append(element.Children, el)
-		}
-		// if element.Name != el.Name {
-		// 	element.Children = append(element.Children, el)
-		// }
-		// // element.Children = append(element.Children, el)
-
-		fmt.Printf("[---] : %+v \n\n", element)
-		// (*components)[node.ID] = entry
 	}
+
+	if node.IsComponentSet() {
+		fmt.Printf("[COMPONENT_SET] : %+v \n\n", (*components)[node.ID].Name)
+		el.Variants = node.Variants()
+	}
+	if node.IsInstance() {
+		fmt.Printf("[INSTANCE] : %+v \n\n", (*components)[node.ID].Name)
+	}
+	if node.IsComponent() {
+		fmt.Printf("[COMPONENT] : %+v \n\n", (*components)[node.ID].Name)
+		if parent.IsComponentSet() {
+			fmt.Printf("[PARENT IS SET] : %+v \n\n", parent.Name)
+			el.Name = fmt.Sprintf("%v", fg.ToKebabCase(parent.Name))
+		}
+	}
+	if !node.IsComponentSet() && !node.IsInstance() && !node.IsComponent() {
+		fmt.Printf("[FRAME] : %+v %+v \n\n", node.Name, node.Type)
+	}
+
+	el.Attributes = node.Classes()
+
+	if !node.IsComponentSet() && !node.IsInstance() && !node.IsText() && !node.IsVector() {
+		el.Styles = node.Css(parent)
+	}
+
+	if node.IsText() {
+		// TODO: Update node.Font() to get the rest of the styles for a Text element and
+		// and token if exists
+		el.Styles = node.TextCss()
+	}
+	// TODO: vector styles
+	// fmt.Printf("[STYLES] : %+v \n\n", el.Styles)
+	//
+	fmt.Printf("[ELEMENT] : %+v \n\n", el)
+
+	for _, child := range node.Children {
+		// if child.IsText() {
+		// 	fmt.Printf("[TEXT] : %+v \n\n", child.Name)
+		// } else {
+		element = f.generateComponent(id, child, node, components, el, tokens)
+		// }
+	}
+
+	if !ok {
+		element.Children = append(element.Children, el)
+	}
+	// if element.Name != el.Name {
+	// 	element.Children = append(element.Children, el)
+	// }
+	// // element.Children = append(element.Children, el)
+
+	// fmt.Printf("[---] : %+v \n\n", element)
+	// (*components)[node.ID] = entry
+	// }
 	// fmt.Printf("[+++] : %+v \n\n", element)
 	return element
 }
