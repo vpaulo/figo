@@ -51,7 +51,10 @@ func main() {
 
 	// css := figma.ParseCSS(file, tokens)
 	components := figma.ParseComponents(file, tokens)
-	fmt.Printf("[COMPONENTS] : %+v \n\n", components)
+	// fmt.Printf("[COMPONENTS] : %+v \n\n", components)
 	// fmt.Printf("[tokensCSS] : %+v \n\n", tokensCSS)
 	// fmt.Printf("[CSS] : %+v \n\n", css)
+	componentsCSS, err := figma.GenerateComponentsCSS(components)
+
+	fmt.Printf("[componentsCSS] : %+v \n\n", componentsCSS)
 }

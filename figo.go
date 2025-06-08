@@ -25,10 +25,6 @@ type Figma struct {
 func (figma *Figma) getUri() (string, error) {
 	// TODO: download maybe become very large with geometry=path param
 	component_url := `https://api.figma.com/v1/files/{{.FILE_KEY}}?geometry=paths`
-	// t, parsingFailure := template.New("figma_uri").Parse(component_url)
-	// if parsingFailure != nil {
-	// 	return "", parsingFailure
-	// }
 
 	t := fg.CreateTmpl("figma_uri", component_url)
 
@@ -419,7 +415,7 @@ func (f *Figma) ParseComponents(file figma.File, tokens map[string]figma.Token) 
 		for _, node := range children {
 			if node.IsComponentOrSet() {
 				element := components[node.ID]
-				components[node.ID] = f.generateComponent(node.ID, node, figma.Node{}, &components, element, &tokens)
+				components[node.ID] = f.generateComponent(node.ID, node, figma.Node{}, "", &components, element, &tokens)
 
 				// fmt.Printf("[yyy] : %+v \n\n", components[node.ID])
 			}
@@ -453,78 +449,93 @@ func (f *Figma) initElementData(file figma.File) map[string]fg.Element {
 	return components
 }
 
-func (f *Figma) generateComponent(id string, node figma.Node, parent figma.Node, components *map[string]fg.Element, element fg.Element, tokens *map[string]figma.Token) fg.Element {
+func (f *Figma) generateComponent(id string, node figma.Node, parent figma.Node, parentClasses string, components *map[string]fg.Element, element fg.Element, tokens *map[string]figma.Token) fg.Element {
 	// if id != "505:17" {
 	// 	return element
 	// }
-	// if /*node.IsFrame() &&*/ id == "234:264" {
-	var el fg.Element
 
-	entry, ok := (*components)[node.ID]
+	isMainComponent := false
 
-	if ok {
-		fmt.Printf("[IS COMPONENT] : %+v \n\n", entry.Name)
-		el = entry
+	if element.Name != "" {
+		isMainComponent = true
+	}
+
+	if isMainComponent {
+		fmt.Printf("[IS COMPONENT] : %+v \n\n", element.Name)
 	} else {
 		fmt.Printf("[NOT COMPONENT] : %+v \n\n", node.Name)
-		el = fg.Element{
-			Name: fmt.Sprintf("%v", fg.ToKebabCase(node.Name)),
-		}
+		element.Name = fmt.Sprintf("%v", fg.ToKebabCase(node.Name))
 	}
+
+	element.Selectors = fmt.Sprintf("%v %v", parentClasses, node.Classes())
 
 	if node.IsComponentSet() {
 		fmt.Printf("[COMPONENT_SET] : %+v \n\n", (*components)[node.ID].Name)
-		el.Variants = node.Variants()
+		element.Variants = node.Variants()
 	}
 	if node.IsInstance() {
 		fmt.Printf("[INSTANCE] : %+v \n\n", (*components)[node.ID].Name)
+		return element
 	}
 	if node.IsComponent() {
 		fmt.Printf("[COMPONENT] : %+v \n\n", (*components)[node.ID].Name)
 		if parent.IsComponentSet() {
 			fmt.Printf("[PARENT IS SET] : %+v \n\n", parent.Name)
-			el.Name = fmt.Sprintf("%v", fg.ToKebabCase(parent.Name))
+			element.Name = fmt.Sprintf("%v", fg.ToKebabCase(parent.Name))
+			element.Selectors = fmt.Sprintf("%v%v", parentClasses, node.Classes())
 		}
 	}
 	if !node.IsComponentSet() && !node.IsInstance() && !node.IsComponent() {
 		fmt.Printf("[FRAME] : %+v %+v \n\n", node.Name, node.Type)
 	}
 
-	el.Attributes = node.Classes()
-
 	if !node.IsComponentSet() && !node.IsInstance() && !node.IsText() && !node.IsVector() {
-		el.Styles = node.Css(parent)
+		element.Styles = node.Css(parent)
 	}
 
 	if node.IsText() {
 		// TODO: Update node.Font() to get the rest of the styles for a Text element and
 		// and token if exists
-		el.Styles = node.TextCss()
+		element.Styles = node.TextCss()
 	}
 	// TODO: vector styles
 	// fmt.Printf("[STYLES] : %+v \n\n", el.Styles)
 	//
-	fmt.Printf("[ELEMENT] : %+v \n\n", el)
+	fmt.Printf("[ELEMENT] : %+v \n\n", element)
 
 	for _, child := range node.Children {
-		// if child.IsText() {
-		// 	fmt.Printf("[TEXT] : %+v \n\n", child.Name)
-		// } else {
-		element = f.generateComponent(id, child, node, components, el, tokens)
-		// }
+		elem := f.generateComponent(id, child, node, element.Selectors, components, fg.Element{}, tokens)
+
+		element.Children = append(element.Children, elem)
 	}
 
-	if !ok {
-		element.Children = append(element.Children, el)
-	}
-	// if element.Name != el.Name {
-	// 	element.Children = append(element.Children, el)
-	// }
-	// // element.Children = append(element.Children, el)
-
-	// fmt.Printf("[---] : %+v \n\n", element)
-	// (*components)[node.ID] = entry
-	// }
 	// fmt.Printf("[+++] : %+v \n\n", element)
 	return element
+}
+
+func (f *Figma) GenerateComponentsCSS(components map[string]fg.Element) (string, error) {
+	var styles []string
+
+	for _, component := range components {
+		if /*id == "505:17" &&*/ component.Selectors != "" {
+			style, err := f.ComponentCSS(component)
+			if err != nil {
+				return "", err
+			}
+			styles = append(styles, style)
+		}
+	}
+
+	return strings.Join(styles, "\n"), nil
+}
+
+func (f *Figma) ComponentCSS(component fg.Element) (string, error) {
+	var out bytes.Buffer
+	tmp := figma.CreateTmpl("components", figma.CssComponentsTemplate)
+	err := tmp.Execute(&out, component)
+	if err != nil {
+		return "", err
+	}
+
+	return out.String(), nil
 }

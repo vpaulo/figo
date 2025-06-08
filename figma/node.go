@@ -540,7 +540,7 @@ func (n *Node) Variants() []Variant {
 	return variants
 }
 
-func (n *Node) Classes() []string {
+func (n *Node) Classes() string {
 	var classes []string
 
 	if strings.Contains(n.Name, ",") {
@@ -574,7 +574,7 @@ func (n *Node) Classes() []string {
 		classes = []string{fmt.Sprintf(".%v", ToKebabCase(n.Name))}
 	}
 
-	return classes
+	return strings.Join(classes, "")
 }
 
 var pseudoClasses = []string{

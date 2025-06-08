@@ -7,7 +7,23 @@ const CssVariablesTemplate = `
 {{- end -}}
 {{$selector}} {
 {{- range $rules }}
- {{ . }}
+ 	{{ . }}
 {{- end }}
 }
 {{ end }}`
+
+const CssComponentsTemplate = `
+{{- define "component" }}
+{{ if .Styles -}}
+{{ .Selectors }} {
+	{{- range $selector, $value := .Styles }}
+	{{ $selector }}: {{ $value }};
+	{{- end }}
+}
+{{- end -}}
+{{- range .Children }}
+{{ template "component" . }}
+{{- end -}}
+{{- end -}}
+{{ template "component" . }}
+`
