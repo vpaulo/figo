@@ -2,8 +2,8 @@ package figma
 
 import (
 	"fmt"
-	"html/template"
 	"strings"
+	"text/template"
 	"unicode"
 )
 

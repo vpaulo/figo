@@ -2,7 +2,6 @@ package figma
 
 import (
 	"maps"
-	"slices"
 	"testing"
 )
 
@@ -697,8 +696,61 @@ func TestNodeCss(t *testing.T) {
 	}
 }
 
-// TODO TextCss
-// TODO Variants
+func TestNodeTextCss(t *testing.T) {
+	var node Node
+	var ans map[string]string
+	var want map[string]string
+
+	node = Node{
+		Type: NodeTypeText,
+		Style: TypeStyle{
+			FontFamily:          "Roboto",
+			FontSize:            16.0,
+			FontWeight:          400,
+			LineHeightPx:        16.0,
+			LetterSpacing:       1.0,
+			TextAlignHorizontal: TextAlignCenter,
+			TextDecoration:      TextDecorationStrikethrough,
+			TextCase:            TextCaseLower,
+			TextTruncation:      "yes",
+			MaxLines:            1.0,
+		},
+		MinWidth:  1.0,
+		MaxWidth:  1.0,
+		MinHeight: 1.0,
+		MaxHeight: 1.0,
+		AbsoluteBoundingBox: Rectangle{
+			Width:  10.0,
+			Height: 10.0,
+		},
+		LayoutSizingHorizontal: LayoutSizingFixed,
+		LayoutSizingVertical:   LayoutSizingFixed,
+	}
+
+	ans = node.TextCss()
+	want = map[string]string{
+		"-webkit-box-orient":   "vertical",
+		"-webkit-line-clamp":   "1",
+		"font-family":          "Roboto",
+		"font-size":            "16px",
+		"font-weight":          "400",
+		"letter-spacing":       "1px",
+		"line-height":          "16px",
+		"text-align":           "center",
+		"text-decoration-line": "strikethrough",
+		"text-overflow":        "ellipsis",
+		"text-transform":       "lowercase",
+		"min-width":            "1px",
+		"max-width":            "1px",
+		"min-height":           "1px",
+		"max-height":           "1px",
+		"width":                "10px",
+		"height":               "10px",
+	}
+	if !maps.Equal(ans, want) {
+		t.Errorf("%+v = %v; want %v", "Text Css", ans, want)
+	}
+}
 
 // name -> .name
 // property=value -> [property="value"]
@@ -707,8 +759,8 @@ func TestNodeCss(t *testing.T) {
 // property=value;class -> [property="value"].class
 func TestNodeClasses(t *testing.T) {
 	var node Node
-	var ans []string
-	var want []string
+	var ans string
+	var want string
 
 	node = Node{
 		Type: NodeTypeFrame,
@@ -716,113 +768,113 @@ func TestNodeClasses(t *testing.T) {
 	}
 
 	ans = node.Classes()
-	want = []string{".my-component"}
-	if !slices.Equal(ans, want) {
+	want = ".my-component"
+	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "myComponent"
 	ans = node.Classes()
-	want = []string{".my-component"}
-	if !slices.Equal(ans, want) {
+	want = ".my-component"
+	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "type=default"
 	ans = node.Classes()
-	want = []string{}
-	if !slices.Equal(ans, want) {
+	want = ""
+	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "type=test"
 	ans = node.Classes()
-	want = []string{"[type=\"test\"]"}
-	if !slices.Equal(ans, want) {
+	want = "[type=\"test\"]"
+	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "type=hover"
 	ans = node.Classes()
-	want = []string{":hover"}
-	if !slices.Equal(ans, want) {
+	want = ":hover"
+	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "type=test,state=ok"
 	ans = node.Classes()
-	want = []string{"[type=\"test\"]", "[state=\"ok\"]"}
-	if !slices.Equal(ans, want) {
+	want = "[type=\"test\"][state=\"ok\"]"
+	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "type=test,state=hover"
 	ans = node.Classes()
-	want = []string{"[type=\"test\"]", ":hover"}
-	if !slices.Equal(ans, want) {
+	want = "[type=\"test\"]:hover"
+	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "state=hover, type=test"
 	ans = node.Classes()
-	want = []string{"[type=\"test\"]", ":hover"}
-	if !slices.Equal(ans, want) {
+	want = "[type=\"test\"]:hover"
+	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "state=default;hover, type=test"
 	ans = node.Classes()
-	want = []string{"[type=\"test\"]", ":hover"}
-	if !slices.Equal(ans, want) {
+	want = "[type=\"test\"]:hover"
+	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "type=test,state=default"
 	ans = node.Classes()
-	want = []string{"[type=\"test\"]"}
-	if !slices.Equal(ans, want) {
+	want = "[type=\"test\"]"
+	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "type=test;hover"
 	ans = node.Classes()
-	want = []string{"[type=\"test\"]", ":hover"}
-	if !slices.Equal(ans, want) {
+	want = "[type=\"test\"]:hover"
+	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "type=test;ok"
 	ans = node.Classes()
-	want = []string{"[type=\"test\"].ok"}
-	if !slices.Equal(ans, want) {
+	want = "[type=\"test\"].ok"
+	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "type=test,hover=true"
 	ans = node.Classes()
-	want = []string{"[type=\"test\"]", ":hover"}
-	if !slices.Equal(ans, want) {
+	want = "[type=\"test\"]:hover"
+	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "type=test,hover=false"
 	ans = node.Classes()
-	want = []string{"[type=\"test\"]"}
-	if !slices.Equal(ans, want) {
+	want = "[type=\"test\"]"
+	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "hover=true"
 	ans = node.Classes()
-	want = []string{":hover"}
-	if !slices.Equal(ans, want) {
+	want = ":hover"
+	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "hover=false"
 	ans = node.Classes()
-	want = []string{}
-	if !slices.Equal(ans, want) {
+	want = ""
+	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 }
