@@ -467,7 +467,7 @@ func (f *Figma) generateComponent(id string, node figma.Node, parent figma.Node,
 		element.Name = fmt.Sprintf("%v", fg.ToKebabCase(node.Name))
 	}
 
-	element.Selectors = fmt.Sprintf("%v %v", parentClasses, node.Classes())
+	element.Selectors = fmt.Sprintf("%v %v", parentClasses, node.Classes(f.Prefix, isMainComponent))
 
 	if node.IsComponentSet() {
 		fmt.Printf("[COMPONENT_SET] : %+v \n\n", (*components)[node.ID].Name)
@@ -481,8 +481,8 @@ func (f *Figma) generateComponent(id string, node figma.Node, parent figma.Node,
 		fmt.Printf("[COMPONENT] : %+v \n\n", (*components)[node.ID].Name)
 		if parent.IsComponentSet() {
 			fmt.Printf("[PARENT IS SET] : %+v \n\n", parent.Name)
-			element.Name = fmt.Sprintf("%v", fg.ToKebabCase(parent.Name))
-			element.Selectors = fmt.Sprintf("%v%v", parentClasses, node.Classes())
+			element.Name = fmt.Sprintf("%v", fg.ToKebabCase(f.Prefix+" "+parent.Name))
+			element.Selectors = fmt.Sprintf("%v%v", parentClasses, node.Classes(f.Prefix, true))
 		}
 	}
 	if !node.IsComponentSet() && !node.IsInstance() && !node.IsComponent() {
@@ -522,7 +522,7 @@ func (f *Figma) GenerateComponentsCSS(components map[string]fg.Element) (string,
 			if err != nil {
 				return "", err
 			}
-			styles = append(styles, style)
+			styles = append(styles, strings.TrimSpace(style))
 		}
 	}
 

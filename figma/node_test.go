@@ -767,112 +767,112 @@ func TestNodeClasses(t *testing.T) {
 		Name: "my-component",
 	}
 
-	ans = node.Classes()
+	ans = node.Classes("", false)
 	want = ".my-component"
 	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "myComponent"
-	ans = node.Classes()
+	ans = node.Classes("", false)
 	want = ".my-component"
 	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "type=default"
-	ans = node.Classes()
+	ans = node.Classes("", false)
 	want = ""
 	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "type=test"
-	ans = node.Classes()
+	ans = node.Classes("", false)
 	want = "[type=\"test\"]"
 	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "type=hover"
-	ans = node.Classes()
+	ans = node.Classes("", false)
 	want = ":hover"
 	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "type=test,state=ok"
-	ans = node.Classes()
+	ans = node.Classes("", false)
 	want = "[type=\"test\"][state=\"ok\"]"
 	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "type=test,state=hover"
-	ans = node.Classes()
+	ans = node.Classes("", false)
 	want = "[type=\"test\"]:hover"
 	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "state=hover, type=test"
-	ans = node.Classes()
+	ans = node.Classes("", false)
 	want = "[type=\"test\"]:hover"
 	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "state=default;hover, type=test"
-	ans = node.Classes()
+	ans = node.Classes("", false)
 	want = "[type=\"test\"]:hover"
 	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "type=test,state=default"
-	ans = node.Classes()
+	ans = node.Classes("", false)
 	want = "[type=\"test\"]"
 	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "type=test;hover"
-	ans = node.Classes()
+	ans = node.Classes("", false)
 	want = "[type=\"test\"]:hover"
 	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "type=test;ok"
-	ans = node.Classes()
+	ans = node.Classes("", false)
 	want = "[type=\"test\"].ok"
 	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "type=test,hover=true"
-	ans = node.Classes()
+	ans = node.Classes("", false)
 	want = "[type=\"test\"]:hover"
 	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "type=test,hover=false"
-	ans = node.Classes()
+	ans = node.Classes("", false)
 	want = "[type=\"test\"]"
 	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "hover=true"
-	ans = node.Classes()
+	ans = node.Classes("", false)
 	want = ":hover"
 	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)
 	}
 
 	node.Name = "hover=false"
-	ans = node.Classes()
+	ans = node.Classes("", false)
 	want = ""
 	if ans != want {
 		t.Errorf("%+v = %v; want %v", "Classes", ans, want)

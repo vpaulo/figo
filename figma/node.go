@@ -540,7 +540,7 @@ func (n *Node) Variants() []Variant {
 	return variants
 }
 
-func (n *Node) Classes() string {
+func (n *Node) Classes(prefix string, addPrefix bool) string {
 	var classes []string
 
 	if strings.Contains(n.Name, ",") {
@@ -572,6 +572,9 @@ func (n *Node) Classes() string {
 		}
 	} else {
 		classes = []string{fmt.Sprintf(".%v", ToKebabCase(n.Name))}
+		if addPrefix {
+			classes = []string{fmt.Sprintf(".%v-%v", prefix, ToKebabCase(n.Name))}
+		}
 	}
 
 	return strings.Join(classes, "")
