@@ -531,7 +531,34 @@ func (f *Figma) GenerateComponentsCSS(components map[string]fg.Element) (string,
 
 func (f *Figma) ComponentCSS(component fg.Element) (string, error) {
 	var out bytes.Buffer
-	tmp := figma.CreateTmpl("components", figma.CssComponentsTemplate)
+	tmp := figma.CreateTmpl("componentsCSS", figma.CssComponentsTemplate)
+	err := tmp.Execute(&out, component)
+	if err != nil {
+		return "", err
+	}
+
+	return out.String(), nil
+}
+
+func (f *Figma) GenerateComponentsHTML(components map[string]fg.Element) (string, error) {
+	var html []string
+
+	for _, component := range components {
+		if /*id == "505:17" &&*/ component.Selectors != "" {
+			style, err := f.ComponentHTML(component)
+			if err != nil {
+				return "", err
+			}
+			html = append(html, strings.TrimSpace(style))
+		}
+	}
+
+	return strings.Join(html, "\n"), nil
+}
+
+func (f *Figma) ComponentHTML(component fg.Element) (string, error) {
+	var out bytes.Buffer
+	tmp := figma.CreateTmpl("componentsHTML", figma.HtmlComponentsTemplate)
 	err := tmp.Execute(&out, component)
 	if err != nil {
 		return "", err
