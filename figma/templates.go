@@ -27,3 +27,16 @@ const CssComponentsTemplate = `
 {{- end -}}
 {{ template "component" . }}
 `
+
+const HtmlComponentsTemplate = `
+{{- define "component" }}
+{{- if gt (len .Variants) 0 }}
+{{- template "component" (index .Children 0) -}}
+{{- else }}
+<div class=".{{.Name}}">
+	{{- range .Children}}{{template "component" .}}{{end -}}
+</div>
+{{ end -}}
+{{ end -}}
+{{template "component" .}}
+`
