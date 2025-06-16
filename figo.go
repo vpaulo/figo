@@ -23,8 +23,7 @@ type Figma struct {
 }
 
 func (figma *Figma) getUri() (string, error) {
-	// TODO: download maybe become very large with geometry=path param
-	component_url := `https://api.figma.com/v1/files/{{.FILE_KEY}}?geometry=paths`
+	component_url := `https://api.figma.com/v1/files/{{.FILE_KEY}}`
 
 	t := fg.CreateTmpl("figma_uri", component_url)
 
