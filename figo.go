@@ -214,7 +214,7 @@ func (f *Figma) mapTokens(node figma.Node, styles *map[string]figma.Style, token
 			if !hasToken && hasStyle {
 				var value string
 				var className string
-				variable, theme := figma.TokenValues(s.Name)
+				variable, theme := figma.TokenValues(s.Name, f.Prefix)
 				switch key {
 				case "fills":
 					value = node.Background()
@@ -250,7 +250,7 @@ func (f *Figma) mapTokens(node figma.Node, styles *map[string]figma.Style, token
 					if !hasToken && hasStyle {
 						var value string
 						var className string
-						variable, theme := figma.TokenValues(s.Name)
+						variable, theme := figma.TokenValues(s.Name, f.Prefix)
 						switch key {
 						case "text":
 							value = child.Font()
@@ -460,33 +460,33 @@ func (f *Figma) generateComponent(id string, node figma.Node, parent figma.Node,
 	}
 
 	if isMainComponent {
-		fmt.Printf("[IS COMPONENT] : %+v \n\n", element.Name)
+		// fmt.Printf("[IS COMPONENT] : %+v \n\n", element.Name)
 	} else {
-		fmt.Printf("[NOT COMPONENT] : %+v \n\n", node.Name)
+		// fmt.Printf("[NOT COMPONENT] : %+v \n\n", node.Name)
 		element.Name = fmt.Sprintf("%v", fg.ToKebabCase(node.Name))
 	}
 
 	element.Selectors = fmt.Sprintf("%v %v", parentClasses, node.Classes(f.Prefix, isMainComponent))
 
 	if node.IsComponentSet() {
-		fmt.Printf("[COMPONENT_SET] : %+v \n\n", (*components)[node.ID].Name)
+		// fmt.Printf("[COMPONENT_SET] : %+v \n\n", (*components)[node.ID].Name)
 		element.Variants = node.Variants()
 	}
 	if node.IsInstance() {
-		fmt.Printf("[INSTANCE] : %+v \n\n", (*components)[node.ID].Name)
+		// fmt.Printf("[INSTANCE] : %+v \n\n", (*components)[node.ID].Name)
 		return element
 	}
 	if node.IsComponent() {
-		fmt.Printf("[COMPONENT] : %+v \n\n", (*components)[node.ID].Name)
+		// fmt.Printf("[COMPONENT] : %+v \n\n", (*components)[node.ID].Name)
 		if parent.IsComponentSet() {
-			fmt.Printf("[PARENT IS SET] : %+v \n\n", parent.Name)
+			// fmt.Printf("[PARENT IS SET] : %+v \n\n", parent.Name)
 			element.Name = fmt.Sprintf("%v", fg.ToKebabCase(f.Prefix+" "+parent.Name))
 			element.Selectors = fmt.Sprintf("%v%v", parentClasses, node.Classes(f.Prefix, true))
 		}
 	}
-	if !node.IsComponentSet() && !node.IsInstance() && !node.IsComponent() {
-		fmt.Printf("[FRAME] : %+v %+v \n\n", node.Name, node.Type)
-	}
+	// if !node.IsComponentSet() && !node.IsInstance() && !node.IsComponent() {
+	// 	fmt.Printf("[FRAME] : %+v %+v \n\n", node.Name, node.Type)
+	// }
 
 	if !node.IsComponentSet() && !node.IsInstance() && !node.IsText() && !node.IsVector() {
 		element.Styles = node.Css(parent)
@@ -500,7 +500,7 @@ func (f *Figma) generateComponent(id string, node figma.Node, parent figma.Node,
 	// TODO: vector styles
 	// fmt.Printf("[STYLES] : %+v \n\n", el.Styles)
 	//
-	fmt.Printf("[ELEMENT] : %+v \n\n", element)
+	// fmt.Printf("[ELEMENT] : %+v \n\n", element)
 
 	for _, child := range node.Children {
 		elem := f.generateComponent(id, child, node, element.Selectors, components, fg.Element{}, tokens)
@@ -516,16 +516,28 @@ func (f *Figma) GenerateComponentsCSS(components map[string]fg.Element) (string,
 	var styles []string
 
 	for _, component := range components {
-		if /*id == "505:17" &&*/ component.Selectors != "" {
-			style, err := f.ComponentCSS(component)
-			if err != nil {
-				return "", err
-			}
-			styles = append(styles, strings.TrimSpace(style))
+		style, err := f.GenerateComponentCSS(component)
+		if err != nil {
+			return "", err
 		}
+		styles = append(styles, strings.TrimSpace(style))
 	}
 
 	return strings.Join(styles, "\n"), nil
+}
+
+func (f *Figma) GenerateComponentCSS(component fg.Element) (string, error) {
+	var styles string
+
+	if component.Selectors != "" {
+		style, err := f.ComponentCSS(component)
+		if err != nil {
+			return "", err
+		}
+		styles = strings.TrimSpace(style)
+	}
+
+	return styles, nil
 }
 
 func (f *Figma) ComponentCSS(component fg.Element) (string, error) {
@@ -543,16 +555,28 @@ func (f *Figma) GenerateComponentsHTML(components map[string]fg.Element) (string
 	var html []string
 
 	for _, component := range components {
-		if /*id == "505:17" &&*/ component.Selectors != "" {
-			style, err := f.ComponentHTML(component)
-			if err != nil {
-				return "", err
-			}
-			html = append(html, strings.TrimSpace(style))
+		style, err := f.GenerateComponentHTML(component)
+		if err != nil {
+			return "", err
 		}
+		html = append(html, strings.TrimSpace(style))
 	}
 
 	return strings.Join(html, "\n"), nil
+}
+
+func (f *Figma) GenerateComponentHTML(component fg.Element) (string, error) {
+	var html string
+
+	if component.Selectors != "" {
+		style, err := f.ComponentHTML(component)
+		if err != nil {
+			return "", err
+		}
+		html = strings.TrimSpace(style)
+	}
+
+	return html, nil
 }
 
 func (f *Figma) ComponentHTML(component fg.Element) (string, error) {
