@@ -86,7 +86,7 @@ func TestTokenValues(t *testing.T) {
 	for _, tt := range values {
 		testname := fmt.Sprintf("TokenValues: %s", tt.s)
 		t.Run(testname, func(t *testing.T) {
-			variable, theme := TokenValues(tt.s)
+			variable, theme := TokenValues(tt.s, "")
 			if variable != tt.wv || theme != tt.wt {
 				t.Errorf("got (%s, %s), want (%s, %s)", variable, theme, tt.wv, tt.wt)
 			}

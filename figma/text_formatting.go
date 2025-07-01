@@ -69,8 +69,11 @@ func ToKebabCase(input string) string {
 	return strings.Join(words, "-")
 }
 
-func TokenValues(name string) (string, string) {
-	variable := fmt.Sprintf("--%v", ToKebabCase(name))
+func TokenValues(name string, prefix string) (string, string) {
+	if prefix != "" {
+		prefix = "-" + prefix
+	}
+	variable := fmt.Sprintf("--%v%v", prefix, ToKebabCase(name))
 	theme := ":root"
 
 	if strings.Contains(name, "/") {
