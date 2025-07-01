@@ -14,3 +14,8 @@ are built in Figma, use the export as a helper or a guide to accelerate developm
 ## HTML
 Export components HTML to help frontends creation, the HTML generated gives a base structure for the
 component created in Figma.
+
+### Run tests
+```
+go test github.com/vpaulo/figo/figma
+```

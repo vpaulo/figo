@@ -93,3 +93,24 @@ func TestTokenValues(t *testing.T) {
 		})
 	}
 }
+
+func TestTokenValuesWithPrefix(t *testing.T) {
+	var values = []struct {
+		s, wv, wt string
+	}{
+		{"TEst", "--cp-test", ":root"},
+		{"foo Baz bar", "--cp-foo-baz-bar", ":root"},
+		{"foo / bar", "--cp-foo-bar", ":root"},
+		{"foo theme/bar", "--cp-bar", "foo-theme"},
+	}
+
+	for _, tt := range values {
+		testname := fmt.Sprintf("TokenValues: %s", tt.s)
+		t.Run(testname, func(t *testing.T) {
+			variable, theme := TokenValues(tt.s, "cp")
+			if variable != tt.wv || theme != tt.wt {
+				t.Errorf("got (%s, %s), want (%s, %s)", variable, theme, tt.wv, tt.wt)
+			}
+		})
+	}
+}
