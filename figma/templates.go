@@ -33,7 +33,7 @@ const HtmlComponentsTemplate = `
 {{- if gt (len .Variants) 0 }}
 {{- template "component" (index .Children 0) -}}
 {{- else }}
-<div class=".{{.Name}}">
+<div class="{{.Name}}">
 	{{- range .Children}}{{template "component" .}}{{end -}}
 </div>
 {{ end -}}
